@@ -61,15 +61,15 @@ We simulate **customer, account, and transaction data**, stream changes in real 
 
 ## 📂 Repository Structure
 ```text
-banking-modern-datastack/
+FinOps-Data-Platform/
 ├── .github/workflows/         # CI/CD pipelines (ci.yml, cd.yml)
 ├── banking_dbt/              # DBT project
 │   ├── models/
 │   │   ├── staging/           # Staging models
 │   │   ├── marts/             # Facts & dimensions
 │   │   └── sources.yml
-│   ├── snapshots/             # SCD2 snapshots
-│   └── dbt_project.yml
+│   ├── snapshots/             
+│   └── dbt_project.yml        # SCD2 snapshots
 ├── consumer
 │   └── kafka_to_minio.py
 ├── data-generator/            # Faker-based data simulator
@@ -139,7 +139,6 @@ banking-modern-datastack/
 
 ---
 
-**Author**: *Jaya Chandra Kadiveti*  
-**LinkedIn**: [jayachandrakadiveti](https://www.linkedin.com/in/jayachandrakadiveti/)  
-**Contact**: [datawithjay1@gmail.com](mailto:datawithjay1@gmail.com)  
-
+**Author**: *Shubham Raju Mergu*  
+**LinkedIn**: [Shubham Mergu](https://www.linkedin.com/in/shubham-mergu/)  
+**Contact**: [shubhammergu.work@gmail.com](mailto:datawithjay1@gmail.com)  
