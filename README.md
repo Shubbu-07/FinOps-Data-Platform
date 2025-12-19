@@ -1,4 +1,4 @@
-# 🏦 Banking Modern Data Stack
+# 🏦 FinOps Data Platform
 
 ![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8?logo=snowflake&logoColor=white)
 ![DBT](https://img.shields.io/badge/dbt-FF694B?logo=dbt&logoColor=white)
@@ -13,10 +13,8 @@
 ---
 
 ## 📌 Project Overview
-This project demonstrates an **end-to-end modern data stack pipeline** for a **Banking domain**.  
-We simulate **customer, account, and transaction data**, stream changes in real time, transform them into analytics-ready models, and visualize insights — following **best practices of CI/CD and data warehousing**.
-
-👉 Think of it as a **real-world banking data ecosystem** built on modern data tools.  
+This project demonstrates a **production-grade**, end-to-end data engineering platform for a banking domain.
+It implements real-time **CDC ingestion**, **batch ELT**, **SCD Type-2 modeling**, and **analytics-ready marts** using modern data engineering tools.
 
 ---
 
@@ -35,7 +33,7 @@ We simulate **customer, account, and transaction data**, stream changes in real 
 
 ---
 
-## ⚡ Tech Stack
+## 🛠️ Tools & Technologies
 - **Snowflake** → Cloud Data Warehouse  
 - **DBT** → Transformations, testing, snapshots (SCD Type-2)  
 - **Apache Airflow** → Orchestration & DAG scheduling  
@@ -61,9 +59,9 @@ We simulate **customer, account, and transaction data**, stream changes in real 
 
 ## 📂 Repository Structure
 ```text
-FinOps-Data-Platform/
+banking-modern-datastack/
 ├── .github/workflows/         # CI/CD pipelines (ci.yml, cd.yml)
-├── banking_dbt/              # DBT project
+├── banking_dbt/               # DBT project
 │   ├── models/
 │   │   ├── staging/           # Staging models
 │   │   ├── marts/             # Facts & dimensions
@@ -91,44 +89,172 @@ FinOps-Data-Platform/
 
 ## ⚙️ Step-by-Step Implementation  
 
-### **1. Data Simulation**  
-- Generated synthetic banking data (**customers, accounts, transactions**) using **Faker**.  
-- Inserted data into **PostgreSQL (OLTP)** so the system behaves like a real transactional database (**ACID, constraints**).  
-- Controlled generation via `config.yaml`.  
+### **Prerequisites**
+Before starting, ensure the following are installed on your system:  
+
+##### **System Services**
+- Docker & Docker Compose
+- Python 3.10+
+- Git
+- Dbt
+- Snowflake account (trial is sufficient)
+---
+
+##### **1. Clone the Repository**  
+
+```text
+git clone https://github.com/<your-username>/finops-data-platform.git
+cd finops-data-platform
+```
+---
+
+##### **2. Configure Environment Variables**  
+```text
+# ---------- Postgres (Banking OLTP) ----------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=banking
+POSTGRES_USER=banking_user
+POSTGRES_PASSWORD=banking_pass
+
+# ---------- Kafka ----------
+KAFKA_BOOTSTRAP=kafka:9092
+KAFKA_GROUP=banking-consumer-group
+
+# ---------- MinIO ----------
+MINIO_ENDPOINT=http://minio:9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET=banking-data
+MINIO_LOCAL_DIR=/tmp/minio_downloads
+
+# ---------- Snowflake ----------
+SNOWFLAKE_ACCOUNT=xxxxxx.ap-south-1
+SNOWFLAKE_USER=xxxx
+SNOWFLAKE_PASSWORD=xxxx
+SNOWFLAKE_WAREHOUSE=COMPUTE_WH
+SNOWFLAKE_DB=BANKING
+SNOWFLAKE_SCHEMA=RAW
+
+# ---------- Airflow DB ----------
+AIRFLOW_DB_USER=airflow
+AIRFLOW_DB_PASSWORD=airflow
+AIRFLOW_DB_NAME=airflow
+
+# ---------- MinIO Root ----------
+MINIO_ROOT_USER=minioadmin
+MINIO_ROOT_PASSWORD=minioadmin
+```
+---
+
+##### **3. Start the Entire Infrastructure**  
+This command launches
+- PostgreSQL
+- Kafka & Zookeeper  
+- Debezium Connect  
+- MinIO  
+- Airflow (Webserver + Scheduler)
+- Airflow Metadata DB
+
+```text
+docker-compose up -d
+docker ps
+```
 
 ---
 
-### **2. Kafka + Debezium CDC**  
-- Set up **Kafka Connect & Debezium** to capture changes from **Postgres**.  
-- Streamed **CDC events** into **MinIO**.  
+##### **4. Connect to Postgres through Dbeaver**
+- Download & Install [DBeaver](https://dbeaver.io/download/)
+- Click New Database Connection → Select Postgres → Enter Details
+- Create Schema (DDL) for **customers**, **accounts** & **transactions**  
 
 ---
 
-### **3. Airflow Orchestration**  
-- Built DAGs to:  
-  - Ingest **MinIO data → Snowflake (Bronze)**.  
-  - Schedule **snapshots & incremental loads**.  
-
+##### **5. Generate Banking Data (Faker)**  
+```text
+pip install -r requirements.txt
+``` 
+###### Run Data Generator
+```text
+python data-generator/faker_generator.py
+```
+###### Note: After sufficient data is generated press **Ctrl + c** to exit iterations
 ---
 
-### **4. Snowflake Warehouse**  
-- Organized into **Bronze → Silver → Gold layers**.  
-- Created **staging schemas** for ingestion.  
-
+##### **6. Create Debezium CDC Connector**  
+###### This step enables Change Data Capture from Postgres to Kafka.
+```text
+python kafka-debezium/generate_and_post_connector.py
+```
 ---
 
-### **5. DBT Transformations**  
-- **Staging models** → cleaned source data.  
-- **Dimension & fact models** → built marts.  
-- **Snapshots** → tracked history of accounts & customers.  
-
+##### **7. Consume Kafka Events → MinIO**  
+###### Run the Kafka consumer:
+```text
+python consumer/kafka_to_minio.py
+```
+###### What happens:
+- Reads CDC events from Kafka
+- Buffers records
+- Writes Parquet files to MinIO
 ---
 
-### **6. CI/CD with GitHub Actions**  
-- **ci.yml** → Lint, dbt compile, run tests.  
-- **cd.yml** → Deploy DAGs & dbt models on merge.  
-
+##### **8. Airflow: Load MinIO → Snowflake (RAW Layer)**
+###### Access Airflow UI
+```text
+http://localhost:8081
+```
+###### Login:
+- Username: airflow
+- Password: airflow
+###### Enable DAG
+- DAG Name: minio_to_snowflake_banking
+- Turn ON
+- Trigger manually (or wait for schedule)
 ---
+
+##### **9. Verify Data in Snowflake (RAW)**
+```text
+SELECT COUNT(*) FROM raw.customers;
+UNION ALL
+SELECT COUNT(*) FROM raw.accounts;
+UNION ALL
+SELECT COUNT(*) FROM raw.transactions;
+```
+---
+
+##### **10. Verify Data in Snowflake (RAW)**
+###### Inside Airflow Container (or locally)
+```text
+cd banking_dbt
+dbt deps
+dbt run
+dbt test
+```
+###### This builds:
+- Staging models
+- Fact & dimension tables
+---
+
+##### **11. Run SCD Type-2 Snapshots**
+###### Enable the Airflow DAG:
+```text
+DAG: SCD2_snapshots
+```
+###### DAG Steps
+- dbt snapshot
+- dbt run --select marts
+
+###### Validate SCD Columns
+```text
+SELECT * FROM ANALYTICS.DIM_CUSTOMERS;
+```
+---
+##### **12. Run SCD Type-2 Snapshots**
+###### Final analytics tables:
+- ANALYTICS.DIM_CUSTOMERS
+- ANALYTICS.DIM_ACCOUNTS
+- ANALYTICS.FACT_TRANSACTIONS
 
 ## 📊 Final Deliverables  
 - **Automated CDC pipeline** from Postgres → Snowflake  
@@ -136,9 +262,9 @@ FinOps-Data-Platform/
 - **Orchestrated DAGs in Airflow**  
 - **Synthetic banking dataset** for demos  
 - **CI/CD workflows** ensuring reliability  
-
 ---
 
-**Author**: *Shubham Raju Mergu*  
-**LinkedIn**: [Shubham Mergu](https://www.linkedin.com/in/shubham-mergu/)  
-**Contact**: [shubhammergu.work@gmail.com](mailto:datawithjay1@gmail.com)  
+**Author**: *Jaya Chandra Kadiveti*  
+**LinkedIn**: [jayachandrakadiveti](https://www.linkedin.com/in/jayachandrakadiveti/)  
+**Contact**: [datawithjay1@gmail.com](mailto:datawithjay1@gmail.com)  
+
