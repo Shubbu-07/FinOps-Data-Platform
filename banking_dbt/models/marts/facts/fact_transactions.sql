@@ -1,4 +1,4 @@
-{{config(materialized='incremental', unique_key='transaction_id')}}
+{{config(materialized='incremental', unique_key='transaction_id', incremental_strategy = 'merge')}}
 
 SELECT
     t.transaction_id,
@@ -13,3 +13,8 @@ SELECT
 FROM {{ref('stg_transactions')}} t
 LEFT JOIN {{ref('stg_accounts')}} a
 ON t.account_id = a.account_id
+
+{% if is_incremental() %}
+WHERE t.transaction_time >
+      (SELECT COALESCE(MAX(transaction_time), '1900-01-01') FROM {{ this }})
+{% endif %}

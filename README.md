@@ -59,15 +59,15 @@ It implements real-time **CDC ingestion**, **batch ELT**, **SCD Type-2 modeling*
 
 ## 📂 Repository Structure
 ```text
-finops-data-platform/
+banking-modern-datastack/
 ├── .github/workflows/         # CI/CD pipelines (ci.yml, cd.yml)
 ├── banking_dbt/               # DBT project
 │   ├── models/
 │   │   ├── staging/           # Staging models
 │   │   ├── marts/             # Facts & dimensions
 │   │   └── sources.yml
-│   ├── snapshots/             # SCD2 snapshots
-│   └── dbt_project.yml
+│   ├── snapshots/             
+│   └── dbt_project.yml        # SCD2 snapshots
 ├── consumer
 │   └── kafka_to_minio.py
 ├── data-generator/            # Faker-based data simulator
@@ -264,6 +264,7 @@ SELECT * FROM ANALYTICS.DIM_CUSTOMERS;
 - **CI/CD workflows** ensuring reliability  
 ---
 
-**Author**: *Shubham Raju Mergu*  
-**LinkedIn**: [Shubham Mergu](https://www.linkedin.com/in/shubham-mergu/)  
-**Contact**: [shubhammergu.work@gmail.com](mailto:shubhammergu.work@gmail.com)  
+**Author**: *Jaya Chandra Kadiveti*  
+**LinkedIn**: [jayachandrakadiveti](https://www.linkedin.com/in/jayachandrakadiveti/)  
+**Contact**: [datawithjay1@gmail.com](mailto:datawithjay1@gmail.com)  
+
