@@ -96,6 +96,7 @@ Before starting, ensure the following are installed on your system:
 - Docker & Docker Compose
 - Python 3.10+
 - Git
+- Dbt
 - Snowflake account (trial is sufficient)
 ---
 
