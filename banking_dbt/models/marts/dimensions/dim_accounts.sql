@@ -2,7 +2,7 @@
 
 with latest as (
     SELECT
-        account_id
+        account_id,
         customer_id,
         account_type,
         balance,
