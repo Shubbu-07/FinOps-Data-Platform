@@ -59,7 +59,7 @@ It implements real-time **CDC ingestion**, **batch ELT**, **SCD Type-2 modeling*
 
 ## 📂 Repository Structure
 ```text
-banking-modern-datastack/
+finops-data-platform/
 ├── .github/workflows/         # CI/CD pipelines (ci.yml, cd.yml)
 ├── banking_dbt/               # DBT project
 │   ├── models/
