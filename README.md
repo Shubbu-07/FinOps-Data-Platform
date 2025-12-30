@@ -264,7 +264,6 @@ SELECT * FROM ANALYTICS.DIM_CUSTOMERS;
 - **CI/CD workflows** ensuring reliability  
 ---
 
-**Author**: *Jaya Chandra Kadiveti*  
-**LinkedIn**: [jayachandrakadiveti](https://www.linkedin.com/in/jayachandrakadiveti/)  
-**Contact**: [datawithjay1@gmail.com](mailto:datawithjay1@gmail.com)  
-
+**Author**: *Shubham Raju Mergu*  
+**LinkedIn**: [shubham-mergu](https://www.linkedin.com/in/shubham-mergu/)  
+**Contact**: [shubhammergu.work@gmail.com](mailto:shubhammergu.work@gmail.com)  
